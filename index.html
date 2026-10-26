@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1430">
+  <meta name="description" content="0xB0DHI — GitHub, Steam, Discord.">
+  <meta property="og:title" content="0xB0DHI">
+  <meta property="og:description" content="GitHub · Steam · Discord">
+  <meta property="og:image" content="assets/alien-observatory.webp">
+  <title>0xB0DHI</title>
+  <link rel="icon" href="assets/avatar.jpg">
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #07132b;
+      --paper: #f9e9c3;
+      --copper: #e9a06f;
+      --blue: #90d4f5;
+      --red: #ef544c;
+      --line: rgba(249,233,195,.48);
+      --display: Georgia, "Times New Roman", serif;
+      --mono: "Cascadia Code", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body { margin: 0; min-height: 100svh; overflow-x: hidden; background: var(--night); color: var(--paper); font-family: var(--mono); }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--paper); outline-offset: 5px; }
+    .skip { position: fixed; left: 20px; top: -60px; z-index: 50; padding: 10px 14px; color: #0d1630; background: var(--paper); }
+    .skip:focus { top: 16px; }
+
+    .world { position: fixed; z-index: -4; inset: -18px; overflow: hidden; pointer-events: none; background: #0b1430; }
+    .world-image { position: absolute; inset: -12px; background: url("assets/alien-observatory.webp") center 50% / cover no-repeat; transform: translate3d(var(--parallax-x, 0px), var(--parallax-y, 0px), 0) scale(1.035); transition: transform .9s ease-out; }
+    .world::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(4,9,28,.91) 0%, rgba(5,11,30,.79) 24%, rgba(7,14,35,.30) 55%, rgba(4,8,25,.08) 100%), linear-gradient(0deg, rgba(2,6,19,.70) 0%, transparent 32%, transparent 75%, rgba(3,7,24,.26) 100%); }
+    .vignette { position: fixed; z-index: -3; inset: 0; pointer-events: none; box-shadow: inset 0 0 180px 50px rgba(1,5,18,.25); }
+    .grain { position: fixed; z-index: 10; inset: 0; pointer-events: none; opacity: .15; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E") center / 160px 160px; mix-blend-mode: screen; }
+    .frame { position: fixed; z-index: 9; inset: 18px; pointer-events: none; border: 1px solid rgba(249,233,195,.36); }
+    .frame::before, .frame::after { content: ""; position: absolute; width: 32px; height: 32px; border-color: var(--paper); opacity: .78; }
+    .frame::before { left: -1px; top: -1px; border-left: 2px solid; border-top: 2px solid; }
+    .frame::after { right: -1px; bottom: -1px; border-right: 2px solid; border-bottom: 2px solid; }
+    .stars { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; }
+    .star { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #e8f2ff; box-shadow: 0 0 12px 3px rgba(203,228,255,.35); animation: twinkle var(--time) ease-in-out infinite alternate; opacity: .2; }
+    @keyframes twinkle { to { opacity: .9; transform: scale(1.55); } }
+
+    .page { position: relative; min-height: 100svh; display: flex; flex-direction: column; padding: clamp(42px, 5vw, 76px) clamp(40px, 6.3vw, 110px) clamp(42px, 5vw, 76px); }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: 100%; }
+    .seal { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--paper); font-size: 13px; font-weight: 800; letter-spacing: .16em; }
+    .seal img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid var(--paper); box-shadow: 0 0 0 3px rgba(5,12,32,.55), 0 0 18px rgba(249,233,195,.35); }
+    .seal span { text-shadow: 0 2px 12px #071020; }
+    .mast-mark { display: flex; align-items: center; gap: 12px; font-size: 10px; letter-spacing: .3em; color: rgba(249,233,195,.84); }
+    .mast-mark::before { content: ""; height: 1px; width: 50px; background: currentColor; opacity: .55; }
+
+    .content { width: min(100%, 680px); flex: 1; display: flex; flex-direction: column; justify-content: center; padding: clamp(80px, 11vh, 170px) 0 clamp(90px, 13vh, 155px); }
+    .title-wrap { position: relative; width: min(100%, 535px); }
+    .orbit { position: absolute; z-index: -1; width: clamp(190px, 27vw, 420px); aspect-ratio: 1; left: -12%; top: 50%; transform: translateY(-54%) rotate(-28deg); border: 1px solid rgba(222,226,247,.26); border-radius: 50%; box-shadow: 0 0 0 22px rgba(167,182,240,.025), inset 0 0 24px rgba(118,147,252,.08); }
+    .orbit::after { content: ""; position: absolute; inset: 14%; border: 1px solid rgba(249,233,195,.12); border-radius: 50%; }
+    h1 { margin: 0; position: relative; font-family: var(--display); font-size: clamp(74px, 9.2vw, 146px); font-weight: 900; line-height: .85; letter-spacing: -.07em; white-space: nowrap; }
+    h1 .hex { display: block; margin: 0 0 12px .07em; font-family: var(--mono); font-size: .23em; font-weight: 600; letter-spacing: .18em; color: var(--copper); text-shadow: 0 0 18px rgba(233,160,111,.38); }
+    h1 .name { display: block; width: 100%; text-align: center; font-variant-numeric: lining-nums; background: linear-gradient(180deg, #fff3d8 4%, #e9c9a7 48%, #bf8b70 100%); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-stroke: 1px rgba(255,245,215,.25); filter: drop-shadow(0 9px 15px rgba(2,5,17,.72)); }
+    .title-rule { width: min(100%, 524px); display: flex; align-items: center; gap: 12px; margin: 33px 0 0; opacity: .76; }
+    .title-rule::before, .title-rule::after { content: ""; height: 1px; background: var(--paper); opacity: .72; }
+    .title-rule::before { width: 43px; }
+    .title-rule::after { flex: 1; }
+    .rule-diamond { display: block; width: 7px; height: 7px; border: 1px solid var(--paper); transform: rotate(45deg); }
+
+    .links { list-style: none; width: min(100%, 535px); margin: clamp(46px, 7vh, 84px) 0 0; padding: 0; border-top: 1px solid var(--line); }
+    .links li { margin: 0; }
+    .link { position: relative; width: 100%; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto 28px; align-items: center; column-gap: 17px; min-height: 70px; padding: 9px 7px 9px 4px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--paper); text-decoration: none; text-align: left; font: inherit; cursor: pointer; overflow: hidden; isolation: isolate; transition: padding-left .24s ease, color .24s ease, border-color .24s ease; }
+    .link::before { content: ""; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(248,214,169,.16), rgba(248,214,169,.035) 64%, transparent); transform: translateX(-103%); transition: transform .34s cubic-bezier(.2,.8,.2,1); }
+    .link:hover, .link:focus-visible { padding-left: 14px; border-color: rgba(249,233,195,.86); }
+    .link:hover::before, .link:focus-visible::before { transform: translateX(0); }
+    .link-num { font-size: 11px; letter-spacing: .08em; color: var(--copper); }
+    .link-name { font-family: var(--display); font-size: clamp(26px, 2.3vw, 34px); font-weight: bold; letter-spacing: -.025em; line-height: 1; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
+    .link-handle { min-width: 0; font-size: 11px; color: rgba(249,233,195,.83); letter-spacing: .05em; white-space: nowrap; }
+    .link-arrow { justify-self: end; font-size: 21px; color: var(--copper); transition: transform .24s ease; }
+    .link:hover .link-arrow, .link:focus-visible .link-arrow { transform: translate(4px, -4px); }
+    .link[aria-busy="true"] .link-arrow { transform: none; }
+    .discord-state { position: absolute; left: -9999px; }
+
+    .endmark { display: flex; align-items: end; justify-content: space-between; gap: 20px; color: rgba(249,233,195,.8); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
+    .endmark .glyph { font-size: 18px; color: var(--copper); letter-spacing: 0; }
+    .endmark .line { display: inline-block; width: 56px; height: 1px; background: currentColor; vertical-align: 3px; margin: 0 12px; opacity: .72; }
+    @media (max-width: 800px) {
+      .page { padding: 45px 42px; }
+      .world-image { background-position: 61% center; }
+      .world::after { background: linear-gradient(90deg, rgba(3,7,23,.87), rgba(3,8,26,.48) 57%, rgba(3,7,23,.18)), linear-gradient(0deg, rgba(2,5,20,.83), transparent 45%, rgba(3,7,23,.23)); }
+      .content { padding: 105px 0 115px; }
+      h1 { font-size: clamp(70px, 12.5vw, 108px); }
+    }
+    @media (max-width: 550px) {
+      .frame { inset: 10px; }
+      .page { padding: 31px 29px 33px; }
+      .seal { font-size: 11px; }
+      .seal img { width: 36px; height: 36px; }
+      .mast-mark { font-size: 8px; letter-spacing: .12em; }
+      .mast-mark::before { width: 19px; }
+      .world-image { background-position: 61% center; }
+      .world::after { background: linear-gradient(180deg, rgba(3,7,24,.35), rgba(3,7,24,.38) 32%, rgba(2,6,23,.89) 77%, rgba(2,6,23,.95)), linear-gradient(90deg, rgba(3,7,24,.40), transparent 80%); }
+      .content { justify-content: flex-end; padding: 155px 0 72px; }
+      .title-wrap { width: 100%; margin-inline: auto; }
+      h1 { display: flex; flex-direction: column; align-items: center; font-size: clamp(61px, 16.3vw, 88px); text-align: center; }
+      h1 .hex { margin: 0 0 12px; line-height: 1; }
+      h1 .name { width: auto; padding-right: .07em; }
+      .orbit { width: 230px; }
+      .title-rule { margin: 27px auto 0; }
+      .links { margin-top: 42px; }
+      .link { grid-template-columns: 27px minmax(0, 1fr) auto 20px; min-height: 67px; column-gap: 9px; }
+      .link-name { font-size: 27px; }
+      .link-handle { font-size: 10px; }
+      .link-arrow { font-size: 18px; }
+      .endmark { font-size: 8px; letter-spacing: .1em; }
+      .endmark .line { width: 20px; margin: 0 5px; }
+    }
+    @media (max-width: 370px) { .link { grid-template-columns: 22px minmax(0, 1fr) 18px; } .link-handle { display: none; } .mast-mark { display: none; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } .world-image { transform: scale(1.035); } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#links">Skip to links</a>
+  <div class="world" aria-hidden="true"><div class="world-image" id="world-image"></div></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="stars" id="stars" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="frame" aria-hidden="true"></div>
+
+  <main class="page">
+    <header class="masthead">
+      <a class="seal" href="#top" aria-label="0xB0DHI home"><img src="assets/avatar.jpg" alt=""><span>0xB0DHI</span></a>
+      <span class="mast-mark" aria-hidden="true">✦ &nbsp; ✦ &nbsp; ✦</span>
+    </header>
+
+    <div class="content" id="top">
+      <div class="title-wrap">
+        <div class="orbit" aria-hidden="true"></div>
+        <h1 aria-label="0xB0DHI"><span class="hex" aria-hidden="true">0x</span><span class="name" aria-hidden="true">B0DHI</span></h1>
+        <div class="title-rule" aria-hidden="true"><i class="rule-diamond"></i></div>
+      </div>
+
+      <ul class="links" id="links" aria-label="0xB0DHI links">
+        <li><a class="link" href="https://github.com/0xB0DHI" target="_blank" rel="noopener noreferrer"><span class="link-num">01</span><span class="link-name">GitHub</span><span class="link-handle">/0xB0DHI</span><span class="link-arrow" aria-hidden="true">↗</span></a></li>
+        <li><a class="link" href="https://steamcommunity.com/id/0xB0DHI/" target="_blank" rel="noopener noreferrer"><span class="link-num">02</span><span class="link-name">Steam</span><span class="link-handle">/id/0xB0DHI</span><span class="link-arrow" aria-hidden="true">↗</span></a></li>
+        <li><button class="link" id="discord" type="button" aria-label="Copy Discord username 0xb0dhi"><span class="link-num">03</span><span class="link-name">Discord</span><span class="link-handle" id="discord-handle">0xb0dhi</span><span class="link-arrow" aria-hidden="true">⧉</span></button></li>
+      </ul>
+      <span class="discord-state" id="discord-state" role="status" aria-live="polite"></span>
+    </div>
+
+    <div class="endmark" aria-hidden="true"><span><span class="glyph">✦</span><span class="line"></span>0xB0DHI</span><span>◈</span></div>
+  </main>
+
+  <script>
+    (() => {
+      const button = document.getElementById('discord');
+      const handle = document.getElementById('discord-handle');
+      const status = document.getElementById('discord-state');
+      button.addEventListener('click', async () => {
+        button.setAttribute('aria-busy', 'true');
+        try {
+          await navigator.clipboard.writeText('0xb0dhi');
+          handle.textContent = 'copied ✓';
+          status.textContent = 'Discord username copied: 0xb0dhi';
+        } catch {
+          handle.textContent = '0xb0dhi';
+          status.textContent = 'Discord username: 0xb0dhi';
+        }
+        setTimeout(() => { handle.textContent = '0xb0dhi'; button.removeAttribute('aria-busy'); }, 2200);
+      });
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) return;
+      const stars = document.getElementById('stars');
+      let seed = 274;
+      const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      for (let i = 0; i < 22; i++) {
+        const star = document.createElement('i');
+        star.className = 'star';
+        star.style.left = `${random() * 100}%`;
+        star.style.top = `${random() * 76}%`;
+        star.style.setProperty('--time', `${2.5 + random() * 4}s`);
+        star.style.animationDelay = `${-random() * 5}s`;
+        stars.appendChild(star);
+      }
+      if (window.matchMedia('(pointer: fine)').matches) {
+        const world = document.getElementById('world-image');
+        let raf = 0;
+        window.addEventListener('pointermove', event => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(() => {
+            const x = (event.clientX / window.innerWidth - .5) * -13;
+            const y = (event.clientY / window.innerHeight - .5) * -9;
+            world.style.setProperty('--parallax-x', `${x}px`);
+            world.style.setProperty('--parallax-y', `${y}px`);
+          });
+        }, { passive: true });
+      }
+    })();
+  </script>
+</body>
+</html>
